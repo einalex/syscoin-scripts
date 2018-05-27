@@ -1,0 +1,20 @@
+#!/bin/bash
+
+read -e -p "Syscoin Core Release Version: " VERSION
+if [ "$VERSION" = "" ]; then
+	echo "Didn't specify version. Exiting."
+	exit 1
+fi
+
+cd ~/syscoin
+git fetch
+git checkout $VERSION
+
+./autogen.sh
+./configure
+
+src/syscoin-cli stop
+
+make -j$(nproc)
+
+src/syscoind
