@@ -1,8 +1,8 @@
-# syscoin-scripts
+# Syscoin Scripts
 
 This is a collection of scripts that make life around syscoin masternodes a little bit more convenient.
 
-## scripts
+## Scripts
 
 ### update-syscoin
 
