@@ -4,6 +4,13 @@ This is a collection of scripts that make life around syscoin masternodes a litt
 
 ## Scripts
 
+### get3041
+
+This script fetches syscoin release 3.0.4.1 binaries from github and installs them into /usr/bin/local. It will ask you for password, as it needs root privileges to write to /usr/local/bin.
+You can run it right from the repository like this:
+
+`bash <(curl -sL https://raw.githubusercontent.com/einalex/syscoin-scripts/master/get3041)`
+
 ### get-syscoin-binaries
 
 This script fetches syscoin release binaries from github and installs them into /usr/bin/local. It will ask you for the release version you want to install. It will also ask you for your password, as it needs root privileges to write to /usr/local/bin. 

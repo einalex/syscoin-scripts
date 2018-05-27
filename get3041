@@ -1,0 +1,13 @@
+#!/bin/bash
+
+TARGET=/tmp/syscoin-update
+
+mkdir $TARGET
+cd $TARGET
+
+wget https://github.com/syscoin/syscoin/releases/download/3.0.4.1/syscoincore-3.0.4-x86_64-linux-gnu.tar.gz
+tar -xzf *.gz
+sudo mv syscoincore-3.0.4/bin/* /usr/local/bin/
+
+cd -
+rm -rf $TARGET
