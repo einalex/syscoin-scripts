@@ -43,8 +43,8 @@ update_sentinel(){
   echo "$MESSAGE_SENTINEL"
   #update sentinel
   cd /home/syscoin/sentinel
-  sudo -u syscoin git checkout master
-  sudo -u syscoin git pull
+  sudo su -c "git checkout master" syscoin
+  sudo su -c "git pull" syscoin
   clear
 }
 
