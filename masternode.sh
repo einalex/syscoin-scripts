@@ -9,7 +9,7 @@ fi
 HBAR="---------------------------------------------------------------------------------------"
 
 # import messages
-source <(curl -sL https://gist.githubusercontent.com/doublesharp/bacf7f9ac1ff15dccc1acffe49f989e9/raw/messages.sh)
+source <(curl -sL https://raw.githubusercontent.com/einalex/syscoin-scripts/master/messages.sh)
 
 pause(){
   echo ""
@@ -190,7 +190,7 @@ rebuild_syscoid() {
   compile             # make and make install
   make_install        # install the binaries
   start_syscoind      # start syscoind back up
-  
+
   echo "$MESSAGE_COMPLETE"
   echo "Syscoin Core update complete using https://www.github.com/syscoin/syscoin/tree/${SYSCOIN_BRANCH}!"
 }
@@ -226,7 +226,7 @@ echo ""
 echo "Before starting script ensure you have: "
 echo ""
 echo "  - Sent 100,000SYS to your masternode address"
-echo "  - Run 'masternode genkey' and 'masternode outputs' and recorded the outputs" 
+echo "  - Run 'masternode genkey' and 'masternode outputs' and recorded the outputs"
 echo "  - Added masternode config file ('Tools>Open Masternode Config' in Syscoin-Qt) "
 echo "    - addressAlias vpsIp:8369 masternodePrivateKey transactionId outputIndex"
 echo "    - EXAMPLE: mn1 ${RESOLVED_ADDRESS}:8369 ctk9ekf0m3049fm930jf034jgwjfk zkjfklgjlkj3rigj3io4jgklsjgklsjgklsdj 0"
@@ -341,14 +341,14 @@ SYSCOIND_SERVICE=$(cat <<EOF
 [Unit]
 Description=Syscoin Core Service
 After=network.target iptables.service firewalld.service
- 
+
 [Service]
 Type=forking
 User=syscoin
 ExecStart=/usr/local/bin/syscoind
 ExecStop=/usr/local/bin/syscoin-cli stop && sleep 20 && /usr/bin/killall syscoind
 ExecReload=/usr/local/bin/syscoin-cli stop && sleep 20 && /usr/local/bin/syscoind
- 
+
 [Install]
 WantedBy=multi-user.target
 EOF
@@ -381,13 +381,13 @@ create_and_configure_syscoin_user(){
 
   # create a syscoin user if it doesn't exist
   grep -q '^syscoin:' /etc/passwd || sudo adduser --disabled-password --gecos "" syscoin
-  
+
   # add alias to .bashrc to run syscoin-cli as sycoin user
   grep -q "syscli\(\)" ~/.bashrc || echo "syscli() { sudo su -c \"syscoin-cli \$*\" syscoin; }" >> ~/.bashrc
   grep -q "alias syscoin-cli" ~/.bashrc || echo "alias syscoin-cli='syscli'" >> ~/.bashrc
   grep -q "sysd\(\)" ~/.bashrc || echo "sysd() { sudo su -c \"syscoind \$*\" syscoin; }" >> ~/.bashrc
   grep -q "alias syscoind" ~/.bashrc || echo "alias syscoind='sysd'" >> ~/.bashrc
-  grep -q "sysmasternode\(\)" ~/.bashrc || echo "sysmasternode() { bash <(curl -sL doublesharp.com/sysmasternode); }" >> ~/.bashrc
+  grep -q "sysmasternode\(\)" ~/.bashrc || echo "sysmasternode() { bash <(curl -sL https://raw.githubusercontent.com/einalex/syscoin-scripts/master/masternode.sh); }" >> ~/.bashrc
 
   echo "$SYSCOIN_CONF" > ~/syscoin.conf
   if [ ! "$IS_MAINNET" = "" ] && [ ! "$IS_MAINNET" = "y" ] && [ ! "$IS_MAINNET" = "Y" ]; then
