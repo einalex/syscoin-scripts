@@ -178,7 +178,7 @@ echo "$MESSAGE_PLAYER_ONE"
 sleep 1
 clear
 
-rebuild_syscoid() {
+rebuild_syscoind() {
   syscoin_branch      # ask which branch to use
   clear
   stop_syscoind       # stop syscoind if it is running
