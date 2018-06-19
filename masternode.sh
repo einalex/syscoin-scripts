@@ -553,5 +553,8 @@ echo ""
 echo "To update this masternode just type:"
 echo ""
 echo "  sysmasternode"
+echo ""
+echo "ATTENTION: Pressing the start button in Qt will reset your qualification time, which will exempt you from getting rewards for |masternodes| * 2.6 / 60 hours. Once you initially started the node this way, ONLY do so again in case the node has been offline for > 4hrs."
+echo ""
 
 do_exit
