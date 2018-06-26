@@ -2,7 +2,6 @@
 
 TARGET=/tmp/syscoin-update
 
-
 read -e -p "Syscoin Core Release Version: " VERSION
 if [ "$VERSION" = "" ]; then
 	echo "Didn't specify version. Exiting."
@@ -12,9 +11,19 @@ fi
 mkdir $TARGET
 cd $TARGET
 
+wget https://github.com/syscoin/syscoin/releases/download/$VERSION/SHA256SUMS.asc
 wget https://github.com/syscoin/syscoin/releases/download/$VERSION/syscoincore-$VERSION-x86_64-linux-gnu.tar.gz
-tar -xzf *.gz
-sudo mv syscoincore-$VERSION/bin/* /usr/local/bin/
-
+sha256sum --status --ignore-missing -c SHA256SUMS.asc
+if [ $? -eq 0 ]
+then
+	tar xzf syscoincore-$VERSION-x86_64-linux-gnu.tar.gz syscoincore-$VERSION/bin/syscoin-cli -O > syscoin-cli
+	tar xzf syscoincore-$VERSION-x86_64-linux-gnu.tar.gz syscoincore-$VERSION/bin/syscoind -O > syscoind
+	rm syscoincore-$VERSION-x86_64-linux-gnu.tar.gz
+	chmod +x syscoin*
+	sudo chown root:root syscoin*
+	sudo rm /usr/local/bin/syscoin*
+	sudo mv syscoin* /usr/local/bin/
+	echo "Successfully updated";
+fi
 cd -
 rm -rf $TARGET
