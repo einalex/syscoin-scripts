@@ -1,13 +1,15 @@
 #!/bin/bash
 
 TARGET=/tmp/syscoin-update
-
-read -e -p "Syscoin Core Release Version: " VERSION
-if [ "$VERSION" = "" ]; then
-	echo "Didn't specify version. Exiting."
-	exit 1
+if [ "$1" = "" ]
+then
+	read -e -p "Syscoin Core Release Version: " VERSION
+  if [ "$VERSION" = "" ]; then
+	  echo "Didn't specify version. Exiting."
+		exit 1
+	fi
 fi
-
+VERSION=$1
 mkdir $TARGET
 cd $TARGET
 
