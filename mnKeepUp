@@ -49,21 +49,26 @@
 # myUsername ALL = NOPASSWD: /bin/systemctl reboot, /bin/systemctl restart syscoind
 # replace 'myUsername' with the username you used in the .ssh/config file
 #
-# Step 5: adjust the paths below as needed and save the script
+# Step 5: (optional but highly recommended): test if the mn vps users can actually restart syscoind and the server without requiring a password
+# on each vps run the following command (NOTICE: they will restart syscoind/the server):
+#  $ sudo systemctl restart syscoind
+#  $ sudo systemctl reboot
+#
+# Step 6: adjust the paths below as needed and save the script
 # the user that should run the script will need writing permissions for the chosen locations
 #
-# Step 6: make the script executable
+# Step 7: make the script executable
 #  $ chmod +x /PATH/TO/AND/nameIChoseForTheScript
 # try running the script from the command line and watch out for errors
 #
-# Step 7: add a line to the user's crontab to run the script automatically
+# Step 8: add a line to the user's crontab to run the script automatically
 #  $ crontab -e
 # add the two line as follows (without the hashtags in front):
 # MAILTO=yourEmailAddress
 # */3  *    *    *    *     /PATH/TO/AND/nameIChoseForTheScript
 # this will run the script every three minutes and whatever the script returns will be sent to your email address (if the server is able to send emails).
 #
-# Step 8: lean back and enjoy a tea, you just automated a large part of your masternode maintenance.
+# Step 9: lean back and enjoy a tea, you just automated a large part of your masternode maintenance.
 # (please keep up to date with new versions of syscoin ;) that's something the script doesn't do yet.)
 
 
