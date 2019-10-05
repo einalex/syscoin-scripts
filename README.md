@@ -4,12 +4,10 @@ This is a collection of scripts that make life around syscoin masternodes a litt
 
 ## Scripts
 
-### get3041
+### mnKeepUp
 
-This script fetches syscoin release 3.0.4.1 binaries from github and installs them into /usr/local/bin. It will ask you for password, as it needs root privileges to write to /usr/local/bin.
-You can run it right from the repository like this:
+This script will keep a number of masternodes running and restart them if necessary. Setup instructions can be found inside.
 
-`bash <(curl -sL https://raw.githubusercontent.com/einalex/syscoin-scripts/master/get3041)`
 
 ### get-syscoin-binaries
 
@@ -26,4 +24,4 @@ You can run it fright from the repository like this:
 `bash <(curl -sL https://raw.githubusercontent.com/einalex/syscoin-scripts/master/update-syscoin-manual-installation)`
 
 ## Tips
-If you find some of this useful and want to leave a tip: SPdXXwaMg4cSXfPq6Zn1PZrjz66qsTF4bo
+If you find some of this useful and want to leave a tip: sys1qwdy4clmdr6tgjvk7fugcdg2d46k52xaqzysm3f
