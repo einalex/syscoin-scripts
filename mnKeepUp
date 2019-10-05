@@ -42,21 +42,28 @@
 # make sure you get a shell on the masternode without having to type any passwords. You can exit the shell by typing 'exit'
 # If you want to revert this state later, you can just delete the respective line in the file mentioned in step 2.
 #
-# Step 4: adjust the paths below as needed and save the script
+# Step 4: allow the user on the vps to restart syscoind and reboot the vps
+# run on every mn vps:
+# $ sudo visudo
+# add the following line at the end:
+# myUsername ALL = NOPASSWD: /bin/systemctl reboot, /bin/systemctl restart syscoind
+# replace 'myUsername' with the username you used in the .ssh/config file
+#
+# Step 5: adjust the paths below as needed and save the script
 # the user that should run the script will need writing permissions for the chosen locations
 #
-# Step 5: make the script executable
+# Step 6: make the script executable
 #  $ chmod +x /PATH/TO/AND/nameIChoseForTheScript
 # try running the script from the command line and watch out for errors
 #
-# Step 6: add a line to the user's crontab to run the script automatically
+# Step 7: add a line to the user's crontab to run the script automatically
 #  $ crontab -e
 # add the two line as follows (without the hashtags in front):
 # MAILTO=yourEmailAddress
 # */3  *    *    *    *     /PATH/TO/AND/nameIChoseForTheScript
 # this will run the script every three minutes and whatever the script returns will be sent to your email address (if the server is able to send emails).
 #
-# Step 7: lean back and enjoy a tea, you just automated a large part of your masternode maintenance.
+# Step 8: lean back and enjoy a tea, you just automated a large part of your masternode maintenance.
 # (please keep up to date with new versions of syscoin ;) that's something the script doesn't do yet.)
 
 
