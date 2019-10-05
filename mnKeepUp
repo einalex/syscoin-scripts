@@ -43,9 +43,9 @@
 # If you want to revert this state later, you can just delete the respective line in the file mentioned in step 2.
 #
 # Step 4: allow the user on the vps to restart syscoind and reboot the vps
-# run on every mn vps:
-# $ sudo visudo
-# add the following line at the end:
+# run on every mn vps (to edit the sudoers file):
+#  $ sudo visudo
+# add the following line at the end of the file:
 # myUsername ALL = NOPASSWD: /bin/systemctl reboot, /bin/systemctl restart syscoind
 # replace 'myUsername' with the username you used in the .ssh/config file
 #
