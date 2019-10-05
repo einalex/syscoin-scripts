@@ -51,9 +51,10 @@
 #
 # Step 6: add a line to the user's crontab to run the script automatically
 #  $ crontab -e
-# add a line as follows (without the hashtags in front):
+# add the two line as follows (without the hashtags in front):
+# MAILTO=yourEmailAddress
 # */3  *    *    *    *     /PATH/TO/AND/nameIChoseForTheScript
-# this will run the script every three minutes
+# this will run the script every three minutes and whatever the script returns will be sent to your email address (if the server is able to send emails).
 #
 # Step 7: lean back and enjoy a tea, you just automated a large part of your masternode maintenance.
 # (please keep up to date with new versions of syscoin ;) that's something the script doesn't do yet.)
