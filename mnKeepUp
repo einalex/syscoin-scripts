@@ -1,0 +1,136 @@
+#!/bin/bash
+
+# This script is published under the GPLv3 license. Please modify and share it as you please!
+
+# --- Purpose ---
+# The purpose of this script is to keep a set of masternodes running.
+# It is designed to be run on a linux server and requires the ability
+# to establish ssh connections to the masternodes.
+#
+# --- Preliminaries ---
+# All explanation lines in this file start with a # as that denotes a comment.
+# This way they won't be interpreted as commands and cause errors
+# Lines showing commands that you should run on a terminal/console/shell start with a $
+# (after the initial # that we require to mark the line as a comment).
+# That's linux slang for "run this as an unprivileged user (not root)"
+#
+# --- Setup Guide ---
+# Step 1: Create aliases for ssh connections to your masternode vps
+# edit ~/.ssh/config using an editor of your choice
+# if you don't know about editors, try nano
+# $ nano ~/.ssh/config
+# add lines as follows (without the hashtags in front):
+#
+# Host myMnAlias
+#	   HostName 123.456.789.123
+#	   User myUsername
+#
+# after 'Host' write the name of your masternode as given in your masternode.conf
+# after 'Hostname' write the IP addresss of the vps
+# after 'User' write the username of the user that can use syscoin-cli on the vps
+#
+# Step 2: make sure the user that runs this script can ssh into the vps without using a password (using asymmetric keys)
+# run on the box that should run this script, as the user who will run this script the following command for each of your masternodes:
+#  $ ssh-copy-id myUsername@myMnAlias
+# replace 'myUsername' and 'myMnAlias' with the appropriate values from Step 1.
+# This will copy the user's public ssh key to the ~/.ssh/authorized_keys file of the target user on the target machine.
+# You will likely need to supply that user's password so ssh-copy-id can login to the account.
+#
+# Step 3 (optional but highly recommended): make sure steps 1 and 2 were successful
+# run on the box that should run this script, as the user who will run this script the following command for each of your masternodes:
+#  $ ssh myMnAlias
+# make sure you get a shell on the masternode without having to type any passwords. You can exit the shell by typing 'exit'
+# If you want to revert this state later, you can just delete the respective line in the file mentioned in step 2.
+#
+# Step 4: adjust the paths below as needed and save the script
+# the user that should run the script will need writing permissions for the chosen locations
+#
+# Step 5: make the script executable
+#  $ chmod +x /PATH/TO/AND/nameIChoseForTheScript
+# try running the script from the command line and watch out for errors
+#
+# Step 6: add a line to the user's crontab to run the script automatically
+#  $ crontab -e
+# add a line as follows (without the hashtags in front):
+# */3  *    *    *    *     /PATH/TO/AND/nameIChoseForTheScript
+# this will run the script every three minutes
+#
+# Step 7: lean back and enjoy a tea, you just automated a large part of your masternode maintenance.
+# (please keep up to date with new versions of syscoin ;) that's something the script doesn't do yet.)
+
+
+# If you find this helpful, please share it with your friends ;)
+# I take SYS tips at sys1qq4ua2azraehqx9u25c758wtnledye5mpurp663 ...but don't feel obliged.
+
+
+# --- Configuration ---
+# number of script runs that you want the script to wait before it tries to restart a node that seems down.
+# You have to take into account network latency. 15*3 = 45 minutes seems to work fine for me.
+LIMIT=15
+
+#number of nodes you have
+NODES=1
+
+#path to the syscoin-cli binary
+SYSCOIN_CLI=/PATH/TO/syscoin-cli
+
+#this is essentially a masternode.conf as in your .syscoin folder
+MASTERNODE_LIST=/WHERE/YOU/WANT/TO/KEEP/YOUR/masternode.conf
+
+#at this location the script will keep a small file/folder structure to keep track of your masternode statusses
+STATUS_PATH=/WHERE/YOU/WANT/TO/KEEP/YOUR/masternodeStatus
+
+#log path can be set indepently
+LOG_PATH=$STATUS_PATH/log
+
+# --- Code (no adjustments needed past this line) ---
+mkdir -p $STATUS_PATH
+mkdir -p $LOG_PATH
+
+STATES=$($SYSCOIN_CLI masternodelist full | grep -Fwf <(cat $MASTERNODE_LIST | tail -n "$NODES" | cut -d ' ' -f 4) )
+IPTABLE="$(cat $MASTERNODE_LIST | tail -n  $NODES  | sed 's/.\{124\}$//')"
+if [ $(echo "${STATES}" | sed 's/  \".*\"\: \" *\([A-Z]*\).*\"\,$/\1/' | uniq | wc -l) -ne 1 ]
+then
+	IPS=( $(grep -v " ENABLED" <<<"${STATES}" | grep -Po '[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+') )
+	for IP in "${IPS[@]}"
+	do
+		NODE=$(echo "$IPTABLE" | grep $IP | awk '{print $1}')
+		if [ -f "$STATUS_PATH/$NODE" ]
+		then
+			COUNT=$(cat "$STATUS_PATH/$NODE")
+			COUNT=$((COUNT+1))
+			TIME=$((COUNT*3))
+			if [ $COUNT -eq $LIMIT ]
+			then
+				echo "------- $NODE DOWN - $TIME min - rebooting server -------"
+				echo "$(date -R | sed 's/......$//') ------- $NODE DOWN - $TIME min - rebooting server -------" >> $LOG_PATH
+				ssh $NODE "sudo shutdown -r && exit"
+				echo $COUNT > "$STATUS_PATH/$NODE"
+			else
+				echo "------- $NODE DOWN - $TIME min - waiting for network propagation -------"
+				echo $COUNT > "$STATUS_PATH/$NODE"
+			fi
+		else
+			echo "------- $NODE DOWN - restarting syscoind -------"
+			echo "$(date -R | sed 's/......$//') ------- $NODE DOWN - restarting server -------" >> $LOG_PATH
+			ssh $NODE "sudo systemctl restart syscoind -- && exit"
+			echo "1" > "$STATUS_PATH/$NODE"
+		fi
+		echo "node status is: $(grep  "$IP" <<<"${STATES}" | awk '{print $3}' )"
+	done
+else
+	IPS=( $(grep "ENABLED" <<<"${STATES}" | grep -Po '[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+') )
+	for IP in "${IPS[@]}"
+	do
+		NODE=$(echo "$IPTABLE" | grep $IP | awk '{print $1}')
+		if [ -f "$STATUS_PATH/$NODE" ]
+		then
+			COUNT=$(cat "$STATUS_PATH/$NODE")
+                        COUNT=$((COUNT+1))
+			TIME=$((COUNT*3))
+			echo "------- $NODE UP - after $TIME min -------"
+			echo "$(date -R | sed 's/......$//') ------- $NODE UP - after $TIME min -------" >> $LOG_PATH
+			rm "$STATUS_PATH/$NODE"
+		fi
+	done
+fi
