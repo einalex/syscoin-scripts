@@ -1,6 +1,6 @@
 #!/bin/bash
 
-read -e -p "Syscoin Core Release Version: " VERSION
+read -e -p "Syscoin Release Version: " VERSION
 if [ "$VERSION" = "" ]; then
 	echo "Didn't specify version. Exiting."
 	exit 1

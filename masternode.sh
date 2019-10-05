@@ -20,9 +20,7 @@ do_exit(){
   echo ""
   echo "Install script (and donations welcomed) by:"
   echo ""
-  echo "  demesm @ address SkSsc5DDejrXq2HfRf9B9QDqHrNiuUvA9Y"
-  echo "  doublesharp @ alias doublesharp / address SjaXL2hXfpiuoPZrRFEPawUSHVjwkdu5az"
-  echo "  einalex @ address SPdXXwaMg4cSXfPq6Zn1PZrjz66qsTF4bo"
+  echo "  einalex @ address sys1q4wq4ax0k52jc68d83nc87ws28e23sll4kdhguh"
   echo ""
   echo "Goodbye!"
   echo ""
@@ -42,7 +40,7 @@ update_system(){
 update_sentinel(){
   echo "$MESSAGE_SENTINEL"
   #update sentinel
-  cd /home/syscoin/sentinel
+  cd /var/lib/syscoin/sentinel
   sudo su -c "git checkout master" syscoin
   sudo su -c "git pull" syscoin
   clear
@@ -192,7 +190,7 @@ rebuild_syscoind() {
   start_syscoind      # start syscoind back up
 
   echo "$MESSAGE_COMPLETE"
-  echo "Syscoin Core update complete using https://www.github.com/syscoin/syscoin/tree/${SYSCOIN_BRANCH}!"
+  echo "Syscoin update complete using https://www.github.com/syscoin/syscoin/tree/${SYSCOIN_BRANCH}!"
 }
 
 # errors are shown if LC_ALL is blank when you run locale
@@ -221,7 +219,7 @@ RESOLVED_ADDRESS=$(curl -s ipinfo.io/ip)
 
 echo "$MESSAGE_CONFIGURE"
 echo ""
-echo "This script has been tested on Ubuntu 16.04 LTS x64."
+echo "This script has been tested on Ubuntu 16.04 LTS x64 and Ubuntu 18.04 LTS x64."
 echo ""
 echo "Before starting script ensure you have: "
 echo ""
@@ -248,8 +246,8 @@ externalip="$RESOLVED_ADDRESS"
 port="$DEFAULT_PORT"
 
 # try to read them in from an existing install
-if sudo test -f /home/syscoin/.syscoincore/syscoin.conf; then
-  sudo cp /home/syscoin/.syscoincore/syscoin.conf ~/syscoin.conf
+if sudo test -f /var/lib/syscoin/.syscoin/syscoin.conf; then
+  sudo cp /var/lib/syscoin/.syscoin/syscoin.conf ~/syscoin.conf
   sudo chown $(whoami).$(id -g -n $(whoami)) ~/syscoin.conf
   source ~/syscoin.conf
   rm -f ~/syscoin.conf
@@ -357,10 +355,10 @@ EOF
 # syscoind.service config
 SENTINEL_CONF=$(cat <<EOF
 # syscoin conf location
-syscoin_conf=/home/syscoin/.syscoincore/syscoin.conf
+syscoin_conf=/var/lib/syscoin/.syscoin/syscoin.conf
 
 # db connection details
-db_name=/home/syscoin/sentinel/database/sentinel.db
+db_name=/var/lib/syscoin/sentinel/database/sentinel.db
 db_driver=sqlite
 
 # network
@@ -380,7 +378,7 @@ create_and_configure_syscoin_user(){
   echo "$MESSAGE_CREATE_USER"
 
   # create a syscoin user if it doesn't exist
-  grep -q '^syscoin:' /etc/passwd || sudo adduser --disabled-password --gecos "" syscoin
+  grep -q '^syscoin:' /etc/passwd || sudo adduser --disabled-password --gecos --system --home /var/lib/syscoin syscoin
 
   # add alias to .bashrc to run syscoin-cli as sycoin user
   grep -q "syscli\(\)" ~/.bashrc || echo "syscli() { sudo su -c \"syscoin-cli \$*\" syscoin; }" >> ~/.bashrc
@@ -398,11 +396,11 @@ create_and_configure_syscoin_user(){
   sudo service syscoind stop
 
   # create conf directory
-  sudo mkdir -p /home/syscoin/.syscoincore
-  sudo rm -rf /home/syscoin/.syscoincore/debug.log
-  sudo mv -f ~/syscoin.conf /home/syscoin/.syscoincore/syscoin.conf
-  sudo chown -R syscoin.syscoin /home/syscoin/.syscoincore
-  sudo chmod 600 /home/syscoin/.syscoincore/syscoin.conf
+  sudo mkdir -p /var/lib/syscoin/.syscoin
+  sudo rm -rf /var/lib/syscoin/.syscoin/debug.log
+  sudo mv -f ~/syscoin.conf /var/lib/syscoin/.syscoin/syscoin.conf
+  sudo chown -R syscoin.syscoin /var/lib/syscoin/.syscoin
+  sudo chmod 600 /var/lib/syscoin/.syscoin/syscoin.conf
   clear
 }
 
@@ -474,8 +472,8 @@ configure_sentinel(){
   fi
 
   cd
-  sudo mv -f ~/sentinel /home/syscoin
-  sudo chown -R syscoin.syscoin /home/syscoin/sentinel
+  sudo mv -f ~/sentinel /var/lib/syscoin
+  sudo chown -R syscoin.syscoin /var/lib/syscoin/sentinel
 
   # create sentinel-ping
   echo "$SENTINEL_PING" > ~/sentinel-ping
