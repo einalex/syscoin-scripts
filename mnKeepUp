@@ -49,6 +49,32 @@
 # myUsername ALL = NOPASSWD: /bin/systemctl reboot, /bin/systemctl restart syscoind
 # replace 'myUsername' with the username you used in the .ssh/config file
 #
+# Step 4a (if you did a manual install of the vps): make sure you have a systemd service for your syscoind running on the masternode vps.
+# if there is no service running, create /usr/lib/systemd/system/syscoind.service
+# with content (don't include the hashtags of course, you know the drill):
+#
+# [Unit]
+# Description=Syscoin Service
+# After=network.target iptables.service firewalld.service
+# 
+# [Service]
+# Type=forking
+# User=syscoin
+# Restart=always
+# RestartSec=3
+# ExecStart=/usr/local/bin/syscoind
+# ExecStop=/usr/local/bin/syscoin-cli stop && sleep 20 && /usr/bin/killall syscoind
+# ExecReload=/usr/local/bin/syscoin-cli stop && sleep 20 && /usr/local/bin/syscoind
+# 
+# [Install]
+# WantedBy=multi-user.target
+#
+# you might need to create the 'system' folder yourself. Make sure to adjust the username and path names to your setup.
+# run the following command to tell systemd about your newly created file:
+# $ sudo systemd daemon-reload
+# then kill syscoind and start the systemd service with
+# $ sudo systemctl start syscoind
+#
 # Step 5: (optional but highly recommended): test if the mn vps users can actually restart syscoind and the server without requiring a password
 # on each vps run the following command (NOTICE: they will restart syscoind/the server):
 #  $ sudo systemctl restart syscoind
